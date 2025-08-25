@@ -1,5 +1,6 @@
-use std::fs;
 use std::{env, process};
+
+use minigrep::Config;
 
 fn main() {
     // Using .args() instead of .args_os() as it's simpler
@@ -13,30 +14,8 @@ fn main() {
     println!("Searching for {}", config.query);
     println!("In file {}", config.file_path);
 
-    run(config);
-}
-
-fn run(config: Config) {
-    let contents =
-        fs::read_to_string(config.file_path).expect("Should have been able to read this file");
-    println!("With text:\n{contents}");
-}
-
-struct Config {
-    query: String,
-    file_path: String,
-}
-
-impl Config {
-    // Changed from `new()` to `build()` because new should never fail
-    fn build(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 2 {
-            return Err("Not enough arguments");
-        }
-        // `.clone()` is slow but for simple applications it's
-        let query = args[1].clone();
-        let file_path = args[2].clone();
-
-        Ok(Config { query, file_path })
+    if let Err(e) = minigrep::run(config) {
+        println!("Applicaiton error: {e}");
+        process::exit(1);
     }
 }
