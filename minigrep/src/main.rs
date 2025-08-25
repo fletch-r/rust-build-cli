@@ -5,7 +5,7 @@ fn main() {
     // Using .args() instead of .args_os() as it's simpler
     let args: Vec<String> = env::args().collect();
 
-    let config = parse_config(&args);
+    let config = Config::build(&args);
 
     println!("Searching for {}", config.query);
     println!("In file {}", config.file_path);
@@ -20,10 +20,16 @@ struct Config {
     file_path: String,
 }
 
-fn parse_config(args: &[String]) -> Config {
-    // `.clone()` is slow but for simple applications it's 
-    let query = args[1].clone();
-    let file_path = args[2].clone();
+impl Config {
+    // Changed from `new()` to `build()` because new should never fail
+    fn build(args: &[String]) -> Config {
+        if args.len() < 2 {
+            panic!("Not enough arguments");
+        }
+        // `.clone()` is slow but for simple applications it's
+        let query = args[1].clone();
+        let file_path = args[2].clone();
 
-    Config { query, file_path }
+        Config { query, file_path }
+    }
 }
